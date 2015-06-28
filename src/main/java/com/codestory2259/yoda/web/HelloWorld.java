@@ -1,4 +1,4 @@
-package fr.yoda.web;
+package com.codestory2259.yoda.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
