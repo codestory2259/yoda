@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = HelloWorld.class)
@@ -20,7 +17,7 @@ public class HelloWorldIntegrationTest {
 
     @Test
     public void testName() throws Exception {
-        assertThat(helloWorld, is(notNullValue()));
-        assertThat(helloWorld.sayHello(), is(equalTo("Hey Guys!")));
+        assertThat(helloWorld).isNotNull();
+        assertThat(helloWorld.sayHello()).isEqualTo("Hey Guys!");
     }
 }
