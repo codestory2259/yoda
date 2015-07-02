@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebIntegrationTest("server.port=9000")
 @SpringApplicationConfiguration(classes = Rest.class)
-public class RestTest {
+public class RestIntegrationTest {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
