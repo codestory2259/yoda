@@ -7,13 +7,13 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 @EnableAutoConfiguration
 public class Rest {
 
-    public static final String JSON = "{}";
+    public static final String STATUS_OK = "{\"status\" : \"OK\"}";
 
     public static void main(String... args) {
         SpringApplication.run(Rest.class);
     }
 
     public String status() {
-        return JSON;
+        return STATUS_OK;
     }
 }
