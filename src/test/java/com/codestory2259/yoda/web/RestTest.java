@@ -12,10 +12,11 @@ public class RestTest {
     @Test
     public void statusSendAlwaysOK() throws Exception {
         // when
-        String status = rest.status();
+        Rest.Response response = rest.status();
 
         // then
-        assertThat(status).contains("status").contains("OK");
+        assertThat(response).isNotNull();
+        assertThat(response.status).isEqualTo("OK");
     }
 
     @Test
