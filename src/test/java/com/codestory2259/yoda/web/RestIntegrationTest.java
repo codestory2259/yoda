@@ -7,7 +7,7 @@ import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.codestory2259.yoda.web.utils.JsonAssertions.assertThatJson;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebIntegrationTest("server.port=9000")
@@ -22,6 +22,7 @@ public class RestIntegrationTest {
         String response = restTemplate.getForObject("http://localhost:9000/status", String.class);
 
         // then
-        assertThat(response).isEqualTo("{\"status\":\"OK\"}");
+        assertThatJson(response, "$.status").isEqualTo("OK");
     }
+
 }
