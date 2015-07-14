@@ -25,8 +25,10 @@ public class RestTest {
     private void verifyJsonFormat(String status) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonParser parser = mapper.getFactory().createParser(status);
-        while (parser.nextToken() != null) ;
+        while (parser.nextToken() != null) doNothing();
     }
+
+    private void doNothing() {}
 
     @Test
     public void statusSendAlwaysOK() throws Exception {
