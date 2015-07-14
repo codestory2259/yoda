@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Optional;
 
+import static java.util.Arrays.stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RestTest {
@@ -42,25 +43,45 @@ public class RestTest {
 
     @Test
     public void restMapping() throws Exception {
+        RestAssertions.assertThatController(rest).map("status");
+    }
 
-        Class<? extends Rest> type = rest.getClass();
-        String expectedName = "status";
+    private static class RestAssertions {
+        private final Class<?> controllerType;
 
+        public RestAssertions(Class<?> controllerType) {
+            this.controllerType = controllerType;
+        }
 
+        public static RestAssertions assertThatController(Object controller) {
+            assertThat(controller).isNotNull();
+            return assertThatController(controller.getClass());
+        }
 
+        public static RestAssertions assertThatController(Class<?> type) {
+            assertThat(type).isNotNull();
 
-        RestController annotation = type.getAnnotation(RestController.class);
-        assertThat(annotation).as("The class must be annotated @RestController").isNotNull();
+            RestController annotation = type.getAnnotation(RestController.class);
+            assertThat(annotation).as("The class must be annotated @RestController").isNotNull();
 
-        Method method = Arrays.stream(type.getMethods())
-                .filter(m -> m.getName().equals(expectedName))
-                .findFirst()
-                .get();
+            return new RestAssertions(type);
+        }
 
-        assertThat(method).as("Method must exist").isNotNull();
+        public void map(String methodName) {
+            Method method = findMethod(methodName);
 
-        RequestMapping annotation2 = method.getAnnotation(RequestMapping.class);
-        assertThat(annotation2).as("The method must be annotated @RequestMapping").isNotNull();
-        assertThat(annotation2.produces()).contains("application/json");
+            RequestMapping annotation = method.getAnnotation(RequestMapping.class);
+            assertThat(annotation).as("The method must be annotated @RequestMapping").isNotNull();
+            assertThat(annotation.produces()).contains("application/json");
+        }
+
+        private Method findMethod(String methodName) {
+            Optional<Method> method = stream(controllerType.getMethods())
+                    .filter(m -> m.getName().equals(methodName))
+                    .findFirst();
+
+            assertThat(method.isPresent()).as("Method must exist").isTrue();
+            return method.get();
+        }
     }
 }
