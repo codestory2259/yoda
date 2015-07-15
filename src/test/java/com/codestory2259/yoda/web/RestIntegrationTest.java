@@ -1,5 +1,6 @@
 package com.codestory2259.yoda.web;
 
+import com.codestory2259.yoda.MainClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -11,7 +12,7 @@ import static com.codestory2259.yoda.web.utils.JsonAssertions.assertThatJson;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebIntegrationTest("server.port=9000")
-@SpringApplicationConfiguration(classes = Rest.class)
+@SpringApplicationConfiguration(classes = MainClass.class)
 public class RestIntegrationTest {
 
     private final RestTemplate restTemplate = new RestTemplate();
