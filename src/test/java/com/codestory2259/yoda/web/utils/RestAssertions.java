@@ -1,6 +1,7 @@
 package com.codestory2259.yoda.web.utils;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.Method;
@@ -12,6 +13,7 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class RestAssertions {
 
     private final Class<?> controllerType;
+    private Method method;
 
     public RestAssertions(Class<?> controllerType) {
         this.controllerType = controllerType;
@@ -31,20 +33,27 @@ public class RestAssertions {
         return new RestAssertions(type);
     }
 
-    public void map(String methodName) {
-        Method method = findMethod(methodName);
+    public RestAssertions onMethod(String name) {
+        method = findMethod(name);
 
-        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-        assertThat(annotation).as("The method must be annotated @RequestMapping").isNotNull();
-        assertThat(annotation.produces()).contains("application/json");
+        return this;
     }
 
-    private Method findMethod(String methodName) {
+    private Method findMethod(String expectedName) {
         Optional<Method> method = stream(controllerType.getMethods())
-                .filter(m -> m.getName().equals(methodName))
+                .filter(m -> m.getName().equals(expectedName))
                 .findFirst();
 
         assertThat(method.isPresent()).as("Method must exist").isTrue();
+
         return method.get();
+    }
+
+    public void intercept(RequestMethod requestMethod, String url) {
+        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
+        assertThat(annotation).as("The method must be annotated @RequestMapping").isNotNull();
+        assertThat(annotation.value()).containsOnly(url);
+        assertThat(annotation.method()).contains(requestMethod);
+        assertThat(annotation.produces()).contains("application/json");
     }
 }
