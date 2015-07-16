@@ -26,4 +26,14 @@ public class RestIntegrationTest {
         assertThatJson(response, "$.status").isEqualTo("OK");
     }
 
+    @Test
+    public void retrieveBuildFromJenkins() throws Exception {
+        // when
+        restTemplate.postForObject("http://localhost:9000/build", "{\"name\":\"jenkins\",\"build\":{\"status\":\"SUCCESS\",\"scm\":{\"url\":\"http://monrepo.git\"}}}", Void.class);
+
+        // then
+        String response = restTemplate.getForObject("http://localhost:9000/repository/monrepo", String.class);
+        assertThatJson(response, "$.name").isEqualTo("monrepo");
+        assertThatJson(response, "$.status").isEqualTo("SUCCESS");
+    }
 }
