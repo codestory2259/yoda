@@ -32,7 +32,7 @@ public class RestIntegrationTest {
         restTemplate.postForObject("http://localhost:9000/build", "{\"name\":\"jenkins\",\"build\":{\"status\":\"SUCCESS\",\"scm\":{\"url\":\"http://monrepo.git\"}}}", Void.class);
 
         // then
-        String response = restTemplate.getForObject("http://localhost:9000/repository/monrepo", String.class);
+        String response = restTemplate.getForObject("http://localhost:9000/repository?name=monrepo", String.class);
         assertThatJson(response, "$.name").isEqualTo("monrepo");
         assertThatJson(response, "$.status").isEqualTo("SUCCESS");
     }
