@@ -42,8 +42,8 @@ public class RestIntegrationTest {
         send(POST, "/build", "{\"name\":\"jenkins\",\"build\":{\"status\":\"SUCCESS\",\"scm\":{\"url\":\"http://monrepo.git\"}}}");
 
         // then
-        String response = send(GET, "/repository?name=monrepo");
-        assertThatJson(response, "$.name").isEqualTo("monrepo");
+        String response = send(GET, "/repository/my-awesome-project");
+        assertThatJson(response, "$.name").isEqualTo("my-awesome-project");
         assertThatJson(response, "$.status").isEqualTo("SUCCESS");
     }
 

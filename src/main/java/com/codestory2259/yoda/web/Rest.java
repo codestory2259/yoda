@@ -1,13 +1,13 @@
 package com.codestory2259.yoda.web;
 
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.codestory2259.yoda.web.Rest.Response.OK;
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -26,8 +26,8 @@ public class Rest {
         this.hasBeenCalled = true;
     }
 
-    @RequestMapping(method = GET, value = "/repository", produces = "application/json")
-    public RepositoryResponse repository(@RequestParam(value = "name")  String name) {
+    @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
+    public RepositoryResponse repository(@PathVariable String name) {
         if (!hasBeenCalled)
            throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 

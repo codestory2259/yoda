@@ -33,14 +33,14 @@ public class RestTest {
 
         assertThatController(rest)
                 .onMethod("repository")
-                .intercept(GET, "/repository");
+                .intercept(GET, "/repository/{name}");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void errorOnUnknownRepository() throws Exception {
         // when / then
         rest.repository("unknown-repo");
-        }
+    }
 
     @Test
     public void getInfoOnRepository() throws Exception {
