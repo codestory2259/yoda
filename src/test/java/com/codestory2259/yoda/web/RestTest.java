@@ -12,21 +12,7 @@ public class RestTest {
     private final Rest rest = new Rest();
 
     @Test
-    public void statusSendAlwaysOK() throws Exception {
-        // when
-        Rest.Response response = rest.status();
-
-        // then
-        assertThat(response).isNotNull();
-        assertThat(response.status).isEqualTo("OK");
-    }
-
-    @Test
     public void restMapping() throws Exception {
-        assertThatController(rest)
-                .onMethod("status")
-                .intercept(GET, "/status");
-
         assertThatController(rest)
                 .onMethod("build")
                 .intercept(POST, "/build");

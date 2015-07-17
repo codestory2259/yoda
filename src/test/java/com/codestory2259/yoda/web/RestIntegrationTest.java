@@ -33,7 +33,7 @@ public class RestIntegrationTest {
         String response = send(GET, "/status");
 
         // then
-        assertThatJson(response, "$.status").isEqualTo("OK");
+        assertThatJson(response, "$.response").isNotEmpty();
     }
 
     @Test

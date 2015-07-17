@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.codestory2259.yoda.web.Rest.Response.OK;
 import static java.lang.String.format;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -15,11 +14,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class Rest {
 
     private boolean hasBeenCalled;
-
-    @RequestMapping(method = GET, value = "/status", produces = "application/json")
-    public Response status() {
-        return OK;
-    }
 
     @RequestMapping(method = POST, value = "/build", produces = "application/json")
     public void build(@RequestBody String body) {
@@ -37,12 +31,6 @@ public class Rest {
 
         return response;
 
-    }
-
-    public static class Response {
-        public static final Response OK = new Response();
-
-        public String status = "OK";
     }
 
     public class RepositoryResponse {
