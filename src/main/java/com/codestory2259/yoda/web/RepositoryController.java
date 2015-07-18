@@ -11,7 +11,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-public class Rest {
+public class RepositoryController {
 
     private boolean hasBeenCalled;
 
@@ -21,11 +21,11 @@ public class Rest {
     }
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
-    public RepositoryResponse repository(@PathVariable String name) {
+    public Response repository(@PathVariable String name) {
         if (!hasBeenCalled)
-           throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
+            throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 
-        RepositoryResponse response = new RepositoryResponse();
+        Response response = new Response();
         response.name = name;
         response.status = "SUCCESS";
 
@@ -33,7 +33,7 @@ public class Rest {
 
     }
 
-    public class RepositoryResponse {
+    public static class Response {
         public String name;
         public String status;
     }
