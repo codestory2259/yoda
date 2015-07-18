@@ -25,16 +25,16 @@ public class RepositoryController {
         if (!hasBeenCalled)
             throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 
-        Response response = new Response();
-        response.name = name;
-        response.status = "SUCCESS";
-
-        return response;
-
+        return new Response(name, "SUCCESS");
     }
 
     public static class Response {
         public String name;
         public String status;
+
+        public Response(String name, String status) {
+            this.name = name;
+            this.status = status;
+        }
     }
 }
