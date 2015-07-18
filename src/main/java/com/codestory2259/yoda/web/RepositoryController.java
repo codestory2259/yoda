@@ -17,6 +17,9 @@ public class RepositoryController {
 
     @RequestMapping(method = POST, value = "/build", produces = "application/json")
     public void build(@RequestBody Build build) {
+        if (!"COMPLETED".equals(build.build.phase))
+            throw new IllegalArgumentException("Build phase must be `COMPLETED`");
+
         this.hasBeenCalled = true;
     }
 

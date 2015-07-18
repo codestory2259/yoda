@@ -56,6 +56,12 @@ public class RepositoryControllerTest {
         assertThat(response.status).isEqualTo("SUCCESS");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void notCompletedBuild() throws Exception {
+        // when / then
+        controller.build(createBuild("tatooine", "STARTED", "SUCCESS"));
+    }
+
     private Build createBuild(String repository, String phase, String status) {
         Build build = new Build();
         build.build.phase = phase;
