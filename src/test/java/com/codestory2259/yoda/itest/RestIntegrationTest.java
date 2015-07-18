@@ -39,7 +39,7 @@ public class RestIntegrationTest {
     @Test
     public void retrieveBuildFromJenkins() throws Exception {
         // when
-        send(POST, "/build", "{\"name\":\"jenkins\",\"build\":{\"status\":\"SUCCESS\",\"scm\":{\"url\":\"http://monrepo.git\"}}}");
+        send(POST, "/build", "{\"name\":\"jenkins\",\"build\":{\"status\":\"SUCCESS\",\"scm\":{\"url\":\"http://server/my-awesome-project.git\"}}}");
 
         // then
         String response = send(GET, "/repository/my-awesome-project");
