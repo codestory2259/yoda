@@ -16,7 +16,7 @@ public class RepositoryController {
     private boolean hasBeenCalled;
 
     @RequestMapping(method = POST, value = "/build", produces = "application/json")
-    public void build(@RequestBody String body) {
+    public void build(@RequestBody Build build) {
         this.hasBeenCalled = true;
     }
 
@@ -28,6 +28,20 @@ public class RepositoryController {
         return new Response(name, "SUCCESS");
     }
 
+    public static class Build {
+        public InnerBuild build = new InnerBuild();
+
+        public static class InnerBuild {
+            public String phase;
+            public String status;
+            public SCM scm = new SCM();
+
+            public static class SCM {
+                public String url;
+            }
+        }
+    }
+
     public static class Response {
         public String name;
         public String status;
@@ -36,5 +50,6 @@ public class RepositoryController {
             this.name = name;
             this.status = status;
         }
+
     }
 }

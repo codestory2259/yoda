@@ -2,6 +2,7 @@ package com.codestory2259.yoda.web;
 
 import org.junit.Test;
 
+import static com.codestory2259.yoda.web.RepositoryController.Build;
 import static com.codestory2259.yoda.web.RepositoryController.Response;
 import static com.codestory2259.yoda.web.utils.RestAssertions.assertThatController;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +33,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoOnRepository() throws Exception {
         // given
-        controller.build("dagobah");
+        controller.build(createBuild("dagobah", "COMPLETED", "SUCCESS"));
 
         // when
         Response response = controller.repository("dagobah");
@@ -45,7 +46,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoOnAnotherRepository() throws Exception {
         // given
-        controller.build("tatooine");
+        controller.build(createBuild("tatooine", "COMPLETED", "SUCCESS"));
 
         // when
         Response response = controller.repository("tatooine");
@@ -53,5 +54,13 @@ public class RepositoryControllerTest {
         // then
         assertThat(response.name).isEqualTo("tatooine");
         assertThat(response.status).isEqualTo("SUCCESS");
+    }
+
+    private Build createBuild(String repository, String phase, String status) {
+        Build build = new Build();
+        build.build.phase = phase;
+        build.build.status = status;
+        build.build.scm.url = repository;
+        return build;
     }
 }
