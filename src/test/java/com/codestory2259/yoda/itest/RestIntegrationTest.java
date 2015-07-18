@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -37,14 +38,20 @@ public class RestIntegrationTest {
     }
 
     @Test
-    public void retrieveBuildFromJenkins() throws Exception {
+    public void retrieveFirstBuildFromJenkins() throws Exception {
         // when
-        send(POST, "/build", "{\"name\":\"jenkins\",\"build\":{\"status\":\"SUCCESS\",\"scm\":{\"url\":\"http://server/my-awesome-project.git\"}}}");
+        send(POST, "/build", "{\"name\":\"jenkins\",\"build\":{\"phase\": \"COMPLETED\",\"status\":\"SUCCESS\",\"scm\":{\"url\":\"http://server/my-awesome-project.git\"}}}");
 
         // then
         String response = send(GET, "/repository/my-awesome-project");
         assertThatJson(response, "$.name").isEqualTo("my-awesome-project");
         assertThatJson(response, "$.status").isEqualTo("SUCCESS");
+    }
+
+    @Test(expected = HttpServerErrorException.class)
+    public void ignoreNotFinalizedBuild() throws Exception {
+        // when
+        send(POST, "/build", "{\"name\":\"jenkins\",\"build\":{\"phase\": \"STARTED\",\"status\":\"ANY-STATUS\",\"scm\":{\"url\":\"http://server/ignored-project.git\"}}}");
     }
 
     private String send(HttpMethod httpMethod, String url) throws URISyntaxException {
