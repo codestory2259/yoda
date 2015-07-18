@@ -1,4 +1,4 @@
-package com.codestory2259.yoda.web;
+package com.codestory2259.yoda.itest;
 
 import com.codestory2259.yoda.MainClass;
 import org.junit.Test;
