@@ -6,6 +6,7 @@ public class JsonBuilder {
     private String phase = "COMPLETED";
     private String status = "SUCCESS";
     private String repository = "http://any.server/repository.git";
+    private String branch = "origin/any-branch";
 
     public static JsonBuilder createBuild() {
         return new JsonBuilder();
@@ -26,8 +27,13 @@ public class JsonBuilder {
         return this;
     }
 
+    public JsonBuilder branch(String branch) {
+        this.branch = branch;
+        return this;
+    }
+
     public String get() {
-        String scm = format("{\"url\":\"%s\"}", repository);
+        String scm = format("{\"url\":\"%s\", \"branch\":\"%s\"}", repository, branch);
         String innerBuild = format("{\"phase\":\"%s\", \"status\":\"%s\", \"scm\":%s}", phase, status, scm);
         return format("{\"name\":\"jenkins\", \"build\":%s}", innerBuild);
     }

@@ -51,6 +51,25 @@ public class RestIntegrationTest {
         assertThatJson(response, "$.status").isEqualTo("SUCCESS");
     }
 
+    @Test
+    public void statusForSpecificBranches() throws Exception {
+        // when
+        String repository = "http://server/success-and-failed.git";
+        send(POST, "/build", createBuild().repository(repository).branch("origin/master").status("SUCCESS"));
+        send(POST, "/build", createBuild().repository(repository).branch("origin/ugly-fix").status("FAILED"));
+
+        // then
+        String response = send(GET, "/repository/my-awesome-project");
+        assertThatJson(response, "$.name").isEqualTo("my-awesome-project");
+        assertThatJson(response, "$.status").isEqualTo("FAILED");
+
+        assertThatJson(response, "$.branches[0].name").isEqualTo("origin/master");
+        assertThatJson(response, "$.branches[0].status").isEqualTo("SUCCESS");
+
+        assertThatJson(response, "$.branches[1].name").isEqualTo("origin/ugly-fix");
+        assertThatJson(response, "$.branches[1].status").isEqualTo("FAILED");
+    }
+
     @Test(expected = HttpServerErrorException.class)
     public void ignoreNotFinalizedBuild() throws Exception {
         // when
