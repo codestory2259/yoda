@@ -1,6 +1,7 @@
 package com.codestory2259.yoda.itest;
 
 import com.codestory2259.yoda.MainClass;
+import com.codestory2259.yoda.web.utils.JsonBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static com.codestory2259.yoda.web.utils.JsonAssertions.assertThatJson;
+import static com.codestory2259.yoda.web.utils.JsonBuilder.createBuild;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -25,7 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @SpringApplicationConfiguration(classes = MainClass.class)
 public class RestIntegrationTest {
 
-    private static final String EMPTY = "";
+    private static final JsonBuilder EMPTY = null;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -41,7 +43,7 @@ public class RestIntegrationTest {
     @Test
     public void retrieveFirstBuildFromJenkins() throws Exception {
         // when
-        send(POST, "/build", "{\"build\":{\"phase\": \"COMPLETED\",\"status\":\"SUCCESS\",\"scm\":{\"url\":\"http://server/my-awesome-project.git\"}}}");
+        send(POST, "/build", createBuild().status("SUCCESS").repository("http://server/my-awesome-project.git"));
 
         // then
         String response = send(GET, "/repository/my-awesome-project");
@@ -52,17 +54,21 @@ public class RestIntegrationTest {
     @Test(expected = HttpServerErrorException.class)
     public void ignoreNotFinalizedBuild() throws Exception {
         // when
-        send(POST, "/build", "{\"build\":{\"phase\": \"STARTED\",\"status\":\"ANY-STATUS\",\"scm\":{\"url\":\"http://server/ignored-project.git\"}}}");
+        send(POST, "/build", createBuild().phase("STARTED"));
     }
+
 
     private String send(HttpMethod httpMethod, String url) throws URISyntaxException {
         return send(httpMethod, url, EMPTY);
     }
 
-    private String send(HttpMethod httpMethod, String url, String body) throws URISyntaxException {
+    private String send(HttpMethod httpMethod, String url, JsonBuilder body) throws URISyntaxException {
+        String json = body != null ? body.get() : "";
+
         URI uri = new URI("http://localhost:9000" + url);
-        RequestEntity entity = RequestEntity.method(httpMethod, uri).contentType(APPLICATION_JSON).body(body);
+        RequestEntity entity = RequestEntity.method(httpMethod, uri).contentType(APPLICATION_JSON).body(json);
         ResponseEntity<String> response = restTemplate.exchange(entity, String.class);
         return response.getBody();
     }
+
 }
