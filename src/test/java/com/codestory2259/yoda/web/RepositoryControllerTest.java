@@ -33,7 +33,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoOnRepository() throws Exception {
         // given
-        controller.build(createBuild("dagobah", "COMPLETED", "SUCCESS"));
+        controller.build(createBuild("dagobah", "SUCCESS"));
 
         // when
         Response response = controller.repository("dagobah");
@@ -46,7 +46,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoOnAnotherRepository() throws Exception {
         // given
-        controller.build(createBuild("tatooine", "COMPLETED", "SUCCESS"));
+        controller.build(createBuild("tatooine", "SUCCESS"));
 
         // when
         Response response = controller.repository("tatooine");
@@ -56,15 +56,34 @@ public class RepositoryControllerTest {
         assertThat(response.status).isEqualTo("SUCCESS");
     }
 
+    @Test
+    public void getInfoWithFailedBuild() throws Exception {
+        // given
+        controller.build(createBuild("coruscant", "FAILED"));
+
+        // when
+        Response response = controller.repository("coruscant");
+
+        // then
+        assertThat(response.name).isEqualTo("coruscant");
+        assertThat(response.status).isEqualTo("FAILED");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void notCompletedBuild() throws Exception {
         // when / then
-        controller.build(createBuild("tatooine", "STARTED", "SUCCESS"));
+        controller.build(createUnconmpletedBuild("tatooine"));
     }
 
-    private Build createBuild(String repository, String phase, String status) {
+    private Build createUnconmpletedBuild(String repository) {
+        Build build = createBuild(repository, "ANY-STATUS");
+        build.build.phase = "STARTED";
+        return build;
+    }
+
+    private Build createBuild(String repository, String status) {
         Build build = new Build();
-        build.build.phase = phase;
+        build.build.phase = "COMPLETED";
         build.build.status = status;
         build.build.scm.url = repository;
         return build;

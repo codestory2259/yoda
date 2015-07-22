@@ -13,22 +13,22 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 public class RepositoryController {
 
-    private boolean hasBeenCalled;
+    private Build last;
 
     @RequestMapping(method = POST, value = "/build", produces = "application/json")
     public void build(@RequestBody Build build) {
         if (!"COMPLETED".equals(build.build.phase))
             throw new IllegalArgumentException("Build phase must be `COMPLETED`");
 
-        this.hasBeenCalled = true;
+        this.last = build;
     }
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
     public Response repository(@PathVariable String name) {
-        if (!hasBeenCalled)
+        if (last == null)
             throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 
-        return new Response(name, "SUCCESS");
+        return new Response(name, last.build.status);
     }
 
     public static class Build {
