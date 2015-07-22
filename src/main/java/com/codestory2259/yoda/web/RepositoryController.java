@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.String.format;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -28,7 +31,10 @@ public class RepositoryController {
         if (last == null)
             throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 
-        return new Response(name, last.build.status);
+        Response response = new Response(name, last.build.status);
+        response.branches.add(new Response.Branch(last.build.scm.branch, last.build.status));
+
+        return response;
     }
 
     public static class Build {
@@ -41,6 +47,7 @@ public class RepositoryController {
 
             public static class SCM {
                 public String url;
+                public String branch;
             }
         }
     }
@@ -48,11 +55,29 @@ public class RepositoryController {
     public static class Response {
         public String name;
         public String status;
+        public List<Branch> branches = new ArrayList<>();
 
         public Response(String name, String status) {
             this.name = name;
             this.status = status;
         }
 
+        private static class Branch {
+            public String name;
+            public String status;
+
+            public Branch(String name, String status) {
+                this.name = name;
+                this.status = status;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public String getStatus() {
+                return status;
+            }
+        }
     }
 }

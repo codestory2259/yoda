@@ -33,7 +33,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoOnRepository() throws Exception {
         // given
-        controller.build(createBuild("dagobah", "SUCCESS"));
+        controller.build(createBuild("dagobah", "SUCCESS", "origin/master"));
 
         // when
         Response response = controller.repository("dagobah");
@@ -41,12 +41,15 @@ public class RepositoryControllerTest {
         // then
         assertThat(response.name).isEqualTo("dagobah");
         assertThat(response.status).isEqualTo("SUCCESS");
+        assertThat(response.branches).hasSize(1);
+        assertThat(response.branches).extracting("name").containsOnly("origin/master");
+        assertThat(response.branches).extracting("status").containsOnly("SUCCESS");
     }
 
     @Test
     public void getInfoOnAnotherRepository() throws Exception {
         // given
-        controller.build(createBuild("tatooine", "SUCCESS"));
+        controller.build(createBuild("tatooine", "SUCCESS", "origin/master"));
 
         // when
         Response response = controller.repository("tatooine");
@@ -59,7 +62,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoWithFailedBuild() throws Exception {
         // given
-        controller.build(createBuild("coruscant", "FAILED"));
+        controller.build(createBuild("coruscant", "FAILED", "origin/master"));
 
         // when
         Response response = controller.repository("coruscant");
@@ -67,6 +70,9 @@ public class RepositoryControllerTest {
         // then
         assertThat(response.name).isEqualTo("coruscant");
         assertThat(response.status).isEqualTo("FAILED");
+        assertThat(response.branches).hasSize(1);
+        assertThat(response.branches).extracting("name").containsOnly("origin/master");
+        assertThat(response.branches).extracting("status").containsOnly("FAILED");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -76,16 +82,17 @@ public class RepositoryControllerTest {
     }
 
     private Build createUnconmpletedBuild(String repository) {
-        Build build = createBuild(repository, "ANY-STATUS");
+        Build build = createBuild(repository, "ANY-STATUS", "origin/master");
         build.build.phase = "STARTED";
         return build;
     }
 
-    private Build createBuild(String repository, String status) {
+    private Build createBuild(String repository, String status, String branch) {
         Build build = new Build();
         build.build.phase = "COMPLETED";
         build.build.status = status;
         build.build.scm.url = repository;
+        build.build.scm.branch = branch;
         return build;
     }
 }
