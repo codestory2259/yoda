@@ -18,13 +18,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class RepositoryController {
 
     private List<Build> builds = new ArrayList<>();
+    private Build last;
 
     @RequestMapping(method = POST, value = "/build", produces = "application/json")
     public void build(@RequestBody Build build) {
-        if (!"COMPLETED".equals(build.build.phase))
+        if (!"COMPLETED".equals(build.build.phase)) {
             throw new IllegalArgumentException("Build phase must be `COMPLETED`");
+        }
 
         builds.add(build);
+        last = build;
     }
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
@@ -33,8 +36,7 @@ public class RepositoryController {
             throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 
         Response response = new Response(name);
-        response.status = builds.stream()
-                .findAny().get().build.status;
+        response.status = last.build.status;
         response.branches = builds.stream()
                 .map(build -> new Response.Branch(build.build.scm.branch, build.build.status))
                 .collect(Collectors.toList());

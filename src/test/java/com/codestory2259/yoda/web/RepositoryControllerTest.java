@@ -89,6 +89,20 @@ public class RepositoryControllerTest {
         assertThat(response.branches).extracting("name").contains("origin/master", "origin/develop");
     }
 
+
+    @Test
+    public void repositoryStatusIsLastBuildStatus() throws Exception {
+        // given
+        controller.build(createBuild("hoth", "SUCCESS", "origin/rebels"));
+        controller.build(createBuild("hoth", "FAILED", "origin/empire"));
+
+        // when
+        Response response = controller.repository("hoth");
+
+        // then
+        assertThat(response.status).isEqualTo("FAILED");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void notCompletedBuild() throws Exception {
         // when / then
