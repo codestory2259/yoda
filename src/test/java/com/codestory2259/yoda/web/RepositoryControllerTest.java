@@ -75,6 +75,20 @@ public class RepositoryControllerTest {
         assertThat(response.branches).extracting("status").containsOnly("FAILED");
     }
 
+    @Test
+    public void severalBranches() throws Exception {
+        // given
+        controller.build(createBuild("alderaan", "SUCCESS", "origin/master"));
+        controller.build(createBuild("alderaan", "SUCCESS", "origin/develop"));
+
+        // when
+        Response response = controller.repository("alderaan");
+
+        // then
+        assertThat(response.branches).hasSize(2);
+        assertThat(response.branches).extracting("name").contains("origin/master", "origin/develop");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void notCompletedBuild() throws Exception {
         // when / then

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -16,23 +17,27 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 public class RepositoryController {
 
-    private Build last;
+    private List<Build> builds = new ArrayList<>();
 
     @RequestMapping(method = POST, value = "/build", produces = "application/json")
     public void build(@RequestBody Build build) {
         if (!"COMPLETED".equals(build.build.phase))
             throw new IllegalArgumentException("Build phase must be `COMPLETED`");
 
-        this.last = build;
+        builds.add(build);
     }
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
     public Response repository(@PathVariable String name) {
-        if (last == null)
+        if (builds.isEmpty())
             throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 
-        Response response = new Response(name, last.build.status);
-        response.branches.add(new Response.Branch(last.build.scm.branch, last.build.status));
+        Response response = new Response(name);
+        response.status = builds.stream()
+                .findAny().get().build.status;
+        response.branches = builds.stream()
+                .map(build -> new Response.Branch(build.build.scm.branch, build.build.status))
+                .collect(Collectors.toList());
 
         return response;
     }
@@ -57,9 +62,8 @@ public class RepositoryController {
         public String status;
         public List<Branch> branches = new ArrayList<>();
 
-        public Response(String name, String status) {
+        public Response(String name) {
             this.name = name;
-            this.status = status;
         }
 
         private static class Branch {
