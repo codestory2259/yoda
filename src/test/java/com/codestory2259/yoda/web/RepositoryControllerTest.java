@@ -103,6 +103,15 @@ public class RepositoryControllerTest {
         assertThat(response.status).isEqualTo("FAILED");
     }
 
+    @Test(expected = IllegalArgumentException.class )
+    public void detectUnknownRepositoryFromName() throws Exception {
+        //Given
+        controller.build(createBuild("existing", "SUCCESS", "origin/any"));
+
+        //When / then
+        controller.repository("unknownRepository");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void notCompletedBuild() throws Exception {
         // when / then
