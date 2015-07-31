@@ -32,8 +32,9 @@ public class RepositoryController {
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
     public Response repository(@PathVariable String name) {
-        if(last == null || !last.build.scm.url.contains(name))
+        if(!builds.stream().anyMatch(build -> build.build.scm.url.contains(name)))
             throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
+
         Response response = new Response(name);
         response.status = last.build.status;
         response.branches = builds.stream()

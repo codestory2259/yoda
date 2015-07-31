@@ -112,6 +112,21 @@ public class RepositoryControllerTest {
         controller.repository("unknownRepository");
     }
 
+    @Test
+    public void detectKnownRepositoryFromName() throws Exception {
+
+        //Given
+        controller.build(createBuild("hoth", "SUCCESS", "origin/rebels"));
+
+        controller.build(createBuild("alderan", "SUCCESS", "origin/empire"));
+
+        //When
+        Response reponse = controller.repository("hoth");
+
+        //Then
+        assertThat(reponse.status).isEqualTo("SUCCESS");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void notCompletedBuild() throws Exception {
         // when / then
