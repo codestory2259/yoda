@@ -104,6 +104,32 @@ public class RepositoryControllerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void detectUnknownRepositoryFromName() throws Exception {
+        //Given
+        controller.build(createBuild("existing", "SUCCESS", "origin/any"));
+
+        //When / then
+        controller.repository("unknownRepository");
+    }
+
+    @Test
+    public void detectKnownRepositoryFromName() throws Exception {
+        // Given
+        controller.build(createBuild("first", "SUCCESS", "origin/my-branch"));
+        controller.build(createBuild("second", "FAILED", "origin/another-branch"));
+
+        // When
+        Response response = controller.repository("first");
+
+        // Then
+        assertThat(response.name).isEqualTo("first");
+        assertThat(response.status).isEqualTo("SUCCESS");
+        assertThat(response.branches).hasSize(1);
+        assertThat(response.branches).extracting("name").containsOnly("origin/my-branch");
+        assertThat(response.branches).extracting("status").containsOnly("SUCCESS");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void notCompletedBuild() throws Exception {
         // when / then
         controller.build(createUnconmpletedBuild("tatooine"));

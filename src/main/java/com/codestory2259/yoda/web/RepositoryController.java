@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -18,7 +19,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class RepositoryController {
 
     private List<Build> builds = new ArrayList<>();
-    private Build last;
 
     @RequestMapping(method = POST, value = "/build", produces = "application/json")
     public void build(@RequestBody Build build) {
@@ -27,21 +27,40 @@ public class RepositoryController {
         }
 
         builds.add(build);
-        last = build;
     }
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
     public Response repository(@PathVariable String name) {
-        if (builds.isEmpty())
+        if(!isRepositoryNameExisting(name))
             throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 
         Response response = new Response(name);
-        response.status = last.build.status;
-        response.branches = builds.stream()
-                .map(build -> new Response.Branch(build.build.scm.branch, build.build.status))
-                .collect(Collectors.toList());
+        response.status = findLastStatus(name);
+        response.branches = createResponseBranches(name);
 
         return response;
+    }
+
+    private boolean isRepositoryNameExisting(String name) {
+        return createStreamOfBuilds(name)
+                .findAny()
+                .isPresent();
+    }
+
+    private String findLastStatus(String name) {
+        return createStreamOfBuilds(name)
+                .reduce((a, b) -> b)
+                .get().build.status;
+    }
+
+    private List<Response.Branch> createResponseBranches(String name) {
+        return createStreamOfBuilds(name)
+                .map(build -> new Response.Branch(build.build.scm.branch, build.build.status))
+                .collect(Collectors.toList());
+    }
+
+    private Stream<Build> createStreamOfBuilds(String name) {
+        return builds.stream().filter(build -> build.build.scm.url.contains(name));
     }
 
     public static class Build {

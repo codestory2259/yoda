@@ -1,6 +1,7 @@
 package com.codestory2259.yoda.itest;
 
 import com.codestory2259.yoda.MainClass;
+import com.codestory2259.yoda.web.RepositoryController;
 import com.codestory2259.yoda.web.utils.JsonBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,8 +60,8 @@ public class RestIntegrationTest {
         send(POST, "/build", createBuild().repository(repository).branch("origin/ugly-fix").status("FAILED"));
 
         // then
-        String response = send(GET, "/repository/my-awesome-project");
-        assertThatJson(response, "$.name").isEqualTo("my-awesome-project");
+        String response = send(GET, "/repository/success-and-failed");
+        assertThatJson(response, "$.name").isEqualTo("success-and-failed");
         assertThatJson(response, "$.status").isEqualTo("FAILED");
 
         assertThatJson(response, "$.branches[0].name").isEqualTo("origin/master");
@@ -75,7 +76,6 @@ public class RestIntegrationTest {
         // when
         send(POST, "/build", createBuild().phase("STARTED"));
     }
-
 
     private String send(HttpMethod httpMethod, String url) throws URISyntaxException {
         return send(httpMethod, url, EMPTY);
