@@ -7,8 +7,15 @@ buildscript {
     }
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.5'
+}
+
+
 apply plugin: 'java'
 apply plugin: 'spring-boot'
+
+archivesBaseName = 'yoda'
 
 repositories {
     mavenCentral()
@@ -21,3 +28,5 @@ dependencies {
     testCompile("org.assertj:assertj-core:3.1.+")
     testCompile("com.jayway.jsonpath:json-path:2.0.+")
 }
+
+task stage(dependsOn: [test, build])
