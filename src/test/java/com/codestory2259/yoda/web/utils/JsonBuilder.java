@@ -22,8 +22,8 @@ public class JsonBuilder {
         return this;
     }
 
-    public JsonBuilder repository(String repository) {
-        this.repository = repository;
+    public JsonBuilder repository(String name) {
+        this.repository = format("http://server/%s.git", name);
         return this;
     }
 
