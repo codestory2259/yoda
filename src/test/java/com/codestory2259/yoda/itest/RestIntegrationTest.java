@@ -1,7 +1,6 @@
 package com.codestory2259.yoda.itest;
 
 import com.codestory2259.yoda.MainClass;
-import com.codestory2259.yoda.web.RepositoryController;
 import com.codestory2259.yoda.web.utils.JsonBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +31,8 @@ public class RestIntegrationTest {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    private String response;
+
     @Test
     public void statusResponse() throws Exception {
         // when
@@ -44,10 +45,10 @@ public class RestIntegrationTest {
     @Test
     public void retrieveFirstBuildFromJenkins() throws Exception {
         // when
-        send(POST, "/build", createBuild().status("SUCCESS").repository("http://server/my-awesome-project.git"));
+        send(POST, "/build", createBuild().status("SUCCESS").repository("my-awesome-project"));
 
         // then
-        String response = send(GET, "/repository/my-awesome-project");
+        response = send(GET, "/repository/my-awesome-project");
         assertThatJson(response, "$.name").isEqualTo("my-awesome-project");
         assertThatJson(response, "$.status").isEqualTo("SUCCESS");
     }
@@ -55,12 +56,11 @@ public class RestIntegrationTest {
     @Test
     public void statusForSpecificBranches() throws Exception {
         // when
-        String repository = "http://server/success-and-failed.git";
-        send(POST, "/build", createBuild().repository(repository).branch("origin/master").status("SUCCESS"));
-        send(POST, "/build", createBuild().repository(repository).branch("origin/ugly-fix").status("FAILED"));
+        send(POST, "/build", createBuild().repository("success-and-failed").branch("origin/master").status("SUCCESS"));
+        send(POST, "/build", createBuild().repository("success-and-failed").branch("origin/ugly-fix").status("FAILED"));
 
         // then
-        String response = send(GET, "/repository/success-and-failed");
+        response = send(GET, "/repository/success-and-failed");
         assertThatJson(response, "$.name").isEqualTo("success-and-failed");
         assertThatJson(response, "$.status").isEqualTo("FAILED");
 
@@ -69,6 +69,27 @@ public class RestIntegrationTest {
 
         assertThatJson(response, "$.branches[1].name").isEqualTo("origin/ugly-fix");
         assertThatJson(response, "$.branches[1].status").isEqualTo("FAILED");
+    }
+
+    @Test
+    public void statusForTwoBranches() throws Exception {
+        // given
+        send(POST, "/build", createBuild().repository("first").branch("origin/my-branch").status("SUCCESS"));
+        send(POST, "/build", createBuild().repository("second").branch("origin/another-branch").status("FAILED"));
+
+        // when / then (first repository)
+        response = send(GET, "/repository/first");
+        assertThatJson(response, "$.name").isEqualTo("first");
+        assertThatJson(response, "$.status").isEqualTo("SUCCESS");
+        assertThatJson(response, "$.branches[0].name").isEqualTo("origin/my-branch");
+        assertThatJson(response, "$.branches[0].status").isEqualTo("SUCCESS");
+
+        // when / then (second repository)
+        response = send(GET, "/repository/second");
+        assertThatJson(response, "$.name").isEqualTo("second");
+        assertThatJson(response, "$.status").isEqualTo("FAILED");
+        assertThatJson(response, "$.branches[0].name").isEqualTo("origin/another-branch");
+        assertThatJson(response, "$.branches[0].status").isEqualTo("FAILED");
     }
 
     @Test(expected = HttpServerErrorException.class)
