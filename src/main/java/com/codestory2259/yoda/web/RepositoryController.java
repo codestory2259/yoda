@@ -22,8 +22,8 @@ public class RepositoryController {
 
     @RequestMapping(method = POST, value = "/notification", produces = "application/json")
     public void notification(@RequestBody Notification notification) {
-        if (!"COMPLETED".equals(notification.build.phase)) {
-            throw new IllegalArgumentException("Build phase must be `COMPLETED`");
+        if (!"FINALIZED".equals(notification.build.phase)) {
+            throw new IllegalArgumentException("Build phase must be `FINALIZED`");
         }
 
         notifications.add(notification);
