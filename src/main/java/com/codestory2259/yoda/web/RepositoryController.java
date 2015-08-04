@@ -18,15 +18,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 public class RepositoryController {
 
-    private List<Build> builds = new ArrayList<>();
+    private List<Notification> notifications = new ArrayList<>();
 
-    @RequestMapping(method = POST, value = "/build", produces = "application/json")
-    public void build(@RequestBody Build build) {
-        if (!"COMPLETED".equals(build.build.phase)) {
+    @RequestMapping(method = POST, value = "/notification", produces = "application/json")
+    public void notification(@RequestBody Notification notification) {
+        if (!"COMPLETED".equals(notification.build.phase)) {
             throw new IllegalArgumentException("Build phase must be `COMPLETED`");
         }
 
-        builds.add(build);
+        notifications.add(notification);
     }
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
@@ -59,14 +59,14 @@ public class RepositoryController {
                 .collect(Collectors.toList());
     }
 
-    private Stream<Build> createStreamOfBuilds(String name) {
-        return builds.stream().filter(build -> build.build.scm.url.contains(name));
+    private Stream<Notification> createStreamOfBuilds(String name) {
+        return notifications.stream().filter(notification -> notification.build.scm.url.contains(name));
     }
 
-    public static class Build {
-        public InnerBuild build = new InnerBuild();
+    public static class Notification {
+        public Build build = new Build();
 
-        public static class InnerBuild {
+        public static class Build {
             public String phase;
             public String status;
             public SCM scm = new SCM();

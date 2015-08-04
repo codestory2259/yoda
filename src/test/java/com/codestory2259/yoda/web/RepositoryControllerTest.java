@@ -2,7 +2,7 @@ package com.codestory2259.yoda.web;
 
 import org.junit.Test;
 
-import static com.codestory2259.yoda.web.RepositoryController.Build;
+import static com.codestory2259.yoda.web.RepositoryController.Notification;
 import static com.codestory2259.yoda.web.RepositoryController.Response;
 import static com.codestory2259.yoda.web.utils.RestAssertions.assertThatController;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,8 +16,8 @@ public class RepositoryControllerTest {
     @Test
     public void mapping() throws Exception {
         assertThatController(controller)
-                .onMethod("build")
-                .intercept(POST, "/build");
+                .onMethod("notification")
+                .intercept(POST, "/notification");
 
         assertThatController(controller)
                 .onMethod("repository")
@@ -33,7 +33,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoOnRepository() throws Exception {
         // given
-        controller.build(createBuild("dagobah", "SUCCESS", "origin/master"));
+        controller.notification(create("dagobah", "SUCCESS", "origin/master"));
 
         // when
         Response response = controller.repository("dagobah");
@@ -49,7 +49,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoOnAnotherRepository() throws Exception {
         // given
-        controller.build(createBuild("tatooine", "SUCCESS", "origin/master"));
+        controller.notification(create("tatooine", "SUCCESS", "origin/master"));
 
         // when
         Response response = controller.repository("tatooine");
@@ -62,7 +62,7 @@ public class RepositoryControllerTest {
     @Test
     public void getInfoWithFailedBuild() throws Exception {
         // given
-        controller.build(createBuild("coruscant", "FAILED", "origin/master"));
+        controller.notification(create("coruscant", "FAILED", "origin/master"));
 
         // when
         Response response = controller.repository("coruscant");
@@ -78,8 +78,8 @@ public class RepositoryControllerTest {
     @Test
     public void severalBranches() throws Exception {
         // given
-        controller.build(createBuild("alderaan", "SUCCESS", "origin/master"));
-        controller.build(createBuild("alderaan", "SUCCESS", "origin/develop"));
+        controller.notification(create("alderaan", "SUCCESS", "origin/master"));
+        controller.notification(create("alderaan", "SUCCESS", "origin/develop"));
 
         // when
         Response response = controller.repository("alderaan");
@@ -93,8 +93,8 @@ public class RepositoryControllerTest {
     @Test
     public void repositoryStatusIsLastBuildStatus() throws Exception {
         // given
-        controller.build(createBuild("hoth", "SUCCESS", "origin/rebels"));
-        controller.build(createBuild("hoth", "FAILED", "origin/empire"));
+        controller.notification(create("hoth", "SUCCESS", "origin/rebels"));
+        controller.notification(create("hoth", "FAILED", "origin/empire"));
 
         // when
         Response response = controller.repository("hoth");
@@ -106,7 +106,7 @@ public class RepositoryControllerTest {
     @Test(expected = IllegalArgumentException.class)
     public void detectUnknownRepositoryFromName() throws Exception {
         //Given
-        controller.build(createBuild("existing", "SUCCESS", "origin/any"));
+        controller.notification(create("existing", "SUCCESS", "origin/any"));
 
         //When / then
         controller.repository("unknownRepository");
@@ -115,8 +115,8 @@ public class RepositoryControllerTest {
     @Test
     public void statusDependsOnRepository() throws Exception {
         // Given
-        controller.build(createBuild("repository", "SUCCESS", "origin/branch"));
-        controller.build(createBuild("another", "FAILED", "origin/branch"));
+        controller.notification(create("repository", "SUCCESS", "origin/branch"));
+        controller.notification(create("another", "FAILED", "origin/branch"));
 
         // When
         Response response = controller.repository("repository");
@@ -128,8 +128,8 @@ public class RepositoryControllerTest {
     @Test
     public void branchesDependOnRepository() throws Exception {
         // Given
-        controller.build(createBuild("repository", "SUCCESS", "origin/branch"));
-        controller.build(createBuild("another", "FAILED", "origin/another-branch"));
+        controller.notification(create("repository", "SUCCESS", "origin/branch"));
+        controller.notification(create("another", "FAILED", "origin/another-branch"));
 
         // When
         Response response = controller.repository("repository");
@@ -143,21 +143,21 @@ public class RepositoryControllerTest {
     @Test(expected = IllegalArgumentException.class)
     public void notCompletedBuild() throws Exception {
         // when / then
-        controller.build(createUnconmpletedBuild("tatooine"));
+        controller.notification(createUncompleted("tatooine"));
     }
 
-    private Build createUnconmpletedBuild(String repository) {
-        Build build = createBuild(repository, "ANY-STATUS", "origin/master");
-        build.build.phase = "STARTED";
-        return build;
+    private Notification createUncompleted(String repository) {
+        Notification notification = create(repository, "ANY-STATUS", "origin/master");
+        notification.build.phase = "STARTED";
+        return notification;
     }
 
-    private Build createBuild(String repository, String status, String branch) {
-        Build build = new Build();
-        build.build.phase = "COMPLETED";
-        build.build.status = status;
-        build.build.scm.url = repository;
-        build.build.scm.branch = branch;
-        return build;
+    private Notification create(String repository, String status, String branch) {
+        Notification notification = new Notification();
+        notification.build.phase = "COMPLETED";
+        notification.build.status = status;
+        notification.build.scm.url = repository;
+        notification.build.scm.branch = branch;
+        return notification;
     }
 }
