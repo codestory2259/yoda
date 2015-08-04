@@ -45,7 +45,7 @@ public class RestIntegrationTest {
     @Test
     public void retrieveFirstBuildFromJenkins() throws Exception {
         // when
-        send(POST, "/build", createBuild().status("SUCCESS").repository("my-awesome-project"));
+        send(POST, "/notification", createBuild().status("SUCCESS").repository("my-awesome-project"));
 
         // then
         response = send(GET, "/repository/my-awesome-project");
@@ -56,8 +56,8 @@ public class RestIntegrationTest {
     @Test
     public void statusForSpecificBranches() throws Exception {
         // when
-        send(POST, "/build", createBuild().repository("success-and-failed").branch("origin/master").status("SUCCESS"));
-        send(POST, "/build", createBuild().repository("success-and-failed").branch("origin/ugly-fix").status("FAILED"));
+        send(POST, "/notification", createBuild().repository("success-and-failed").branch("origin/master").status("SUCCESS"));
+        send(POST, "/notification", createBuild().repository("success-and-failed").branch("origin/ugly-fix").status("FAILED"));
 
         // then
         response = send(GET, "/repository/success-and-failed");
@@ -74,8 +74,8 @@ public class RestIntegrationTest {
     @Test
     public void statusForTwoBranches() throws Exception {
         // given
-        send(POST, "/build", createBuild().repository("first").branch("origin/my-branch").status("SUCCESS"));
-        send(POST, "/build", createBuild().repository("second").branch("origin/another-branch").status("FAILED"));
+        send(POST, "/notification", createBuild().repository("first").branch("origin/my-branch").status("SUCCESS"));
+        send(POST, "/notification", createBuild().repository("second").branch("origin/another-branch").status("FAILED"));
 
         // when / then (first repository)
         response = send(GET, "/repository/first");
@@ -95,7 +95,7 @@ public class RestIntegrationTest {
     @Test(expected = HttpServerErrorException.class)
     public void ignoreNotFinalizedBuild() throws Exception {
         // when
-        send(POST, "/build", createBuild().phase("STARTED"));
+        send(POST, "/notification", createBuild().phase("STARTED"));
     }
 
     private String send(HttpMethod httpMethod, String url) throws URISyntaxException {
