@@ -112,6 +112,34 @@ public class RepositoryControllerTest {
         controller.repository("unknownRepository");
     }
 
+    @Test
+    public void statusDependsOnRepository() throws Exception {
+        // Given
+        controller.build(createBuild("repository", "SUCCESS", "origin/branch"));
+        controller.build(createBuild("another", "FAILED", "origin/branch"));
+
+        // When
+        Response response = controller.repository("repository");
+
+        // Then
+        assertThat(response.status).isEqualTo("SUCCESS");
+    }
+
+    @Test
+    public void branchesDependOnRepository() throws Exception {
+        // Given
+        controller.build(createBuild("repository", "SUCCESS", "origin/branch"));
+        controller.build(createBuild("another", "FAILED", "origin/another-branch"));
+
+        // When
+        Response response = controller.repository("repository");
+
+        // Then
+        assertThat(response.branches).hasSize(1);
+        assertThat(response.branches).extracting("name").contains("origin/branch");
+        assertThat(response.branches).extracting("status").contains("SUCCESS");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void notCompletedBuild() throws Exception {
         // when / then
