@@ -3,7 +3,7 @@ package com.codestory2259.yoda.web.utils;
 import static java.lang.String.format;
 
 public class JsonBuilder {
-    private String phase = "COMPLETED";
+    private String phase = "FINALIZED";
     private String status = "SUCCESS";
     private String repository = "http://any.server/repository.git";
     private String branch = "origin/any-branch";

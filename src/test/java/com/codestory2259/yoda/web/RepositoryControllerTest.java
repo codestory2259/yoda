@@ -141,20 +141,20 @@ public class RepositoryControllerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void notCompletedBuild() throws Exception {
+    public void errorWhenBuildIsNotFinalized() throws Exception {
         // when / then
-        controller.notification(createUncompleted("tatooine"));
+        controller.notification(createNotFinalized("tatooine"));
     }
 
-    private Notification createUncompleted(String repository) {
+    private Notification createNotFinalized(String repository) {
         Notification notification = create(repository, "ANY-STATUS", "origin/master");
-        notification.build.phase = "STARTED";
+        notification.build.phase = "ANOTHER-STATUS";
         return notification;
     }
 
     private Notification create(String repository, String status, String branch) {
         Notification notification = new Notification();
-        notification.build.phase = "COMPLETED";
+        notification.build.phase = "FINALIZED";
         notification.build.status = status;
         notification.build.scm.url = repository;
         notification.build.scm.branch = branch;
