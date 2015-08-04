@@ -20,8 +20,8 @@ public class RepositoryController {
 
     private List<Build> builds = new ArrayList<>();
 
-    @RequestMapping(method = POST, value = "/build", produces = "application/json")
-    public void build(@RequestBody Build build) {
+    @RequestMapping(method = POST, value = "/notification", produces = "application/json")
+    public void notification(@RequestBody Build build) {
         if (!"COMPLETED".equals(build.build.phase)) {
             throw new IllegalArgumentException("Build phase must be `COMPLETED`");
         }
