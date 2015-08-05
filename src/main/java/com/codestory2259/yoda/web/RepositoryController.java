@@ -96,14 +96,6 @@ public class RepositoryController {
                 this.name = name;
                 this.status = status;
             }
-
-            public String getName() {
-                return name;
-            }
-
-            public String getStatus() {
-                return status;
-            }
         }
     }
 }
