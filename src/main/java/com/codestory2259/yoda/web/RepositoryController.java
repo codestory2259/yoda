@@ -2,6 +2,7 @@ package com.codestory2259.yoda.web;
 
 
 import lombok.Data;
+import lombok.NonNull;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,23 +86,17 @@ public class RepositoryController {
 
     @Data
     static class Response {
+        @NonNull
         String name;
         String status;
         List<Branch> branches = new ArrayList<>();
 
-        public Response(String name) {
-            this.name = name;
-        }
-
         @Data
         static class Branch {
+            @NonNull
             String name;
+            @NonNull
             String status;
-
-            public Branch(String name, String status) {
-                this.name = name;
-                this.status = status;
-            }
         }
     }
 }
