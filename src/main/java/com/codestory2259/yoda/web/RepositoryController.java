@@ -31,7 +31,7 @@ public class RepositoryController {
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
     public Response repository(@PathVariable String name) {
-        if(!isRepositoryNameExisting(name))
+        if (!isRepositoryNameExisting(name))
             throw new IllegalArgumentException(format("Unknown repository name `%s`", name));
 
         Response response = new Response(name);
@@ -42,25 +42,26 @@ public class RepositoryController {
     }
 
     private boolean isRepositoryNameExisting(String name) {
-        return createStreamOfBuilds(name)
+        return createStreamOfNotifications(name)
                 .findAny()
                 .isPresent();
     }
 
     private String findLastStatus(String name) {
-        return createStreamOfBuilds(name)
+        return createStreamOfNotifications(name)
                 .reduce((a, b) -> b)
                 .get().build.status;
     }
 
     private List<Response.Branch> createResponseBranches(String name) {
-        return createStreamOfBuilds(name)
+        return createStreamOfNotifications(name)
                 .map(build -> new Response.Branch(build.build.scm.branch, build.build.status))
                 .collect(Collectors.toList());
     }
 
-    private Stream<Notification> createStreamOfBuilds(String name) {
-        return notifications.stream().filter(notification -> notification.build.scm.url.contains(name));
+    private Stream<Notification> createStreamOfNotifications(String name) {
+        return notifications.stream()
+                .filter(notification -> notification.build.scm.url.contains(name));
     }
 
     public static class Notification {
