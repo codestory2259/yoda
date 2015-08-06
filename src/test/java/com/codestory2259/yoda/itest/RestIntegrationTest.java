@@ -98,6 +98,27 @@ public class RestIntegrationTest {
         send(POST, "/notification", createBuild().phase("STARTED"));
     }
 
+    @Test
+    public void statusForSameBranches() throws Exception {
+        // when
+        send(POST, "/notification", createBuild().repository("same-branches").branch("origin/master").status("SUCCESS"));
+        send(POST, "/notification", createBuild().repository("same-branches").branch("origin/master").status("FAILED"));
+        send(POST, "/notification", createBuild().repository("same-branches").branch("origin/develop").status("SUCCESS"));
+        send(POST, "/notification", createBuild().repository("same-branches").branch("origin/develop").status("FAILED"));
+
+        // then
+        response = send(GET, "/repository/same-branches");
+        assertThatJson(response, "$.name").isEqualTo("same-branches");
+        assertThatJson(response, "$.status").isEqualTo("FAILED");
+
+        assertThatJson(response, "$.branches[0].name").isEqualTo("origin/master");
+        assertThatJson(response, "$.branches[0].status").isEqualTo("FAILED");
+
+        assertThatJson(response, "$.branches[1].name").isEqualTo("origin/develop");
+        assertThatJson(response, "$.branches[1].status").isEqualTo("FAILED");
+
+    }
+
     private String send(HttpMethod httpMethod, String url) throws URISyntaxException {
         return send(httpMethod, url, EMPTY);
     }
