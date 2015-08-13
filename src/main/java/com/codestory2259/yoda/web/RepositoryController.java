@@ -27,8 +27,13 @@ public class RepositoryController {
         if (!"FINALIZED".equals(notification.build.phase)) {
             throw new IllegalArgumentException("Build phase must be `FINALIZED`");
         }
+        if(!isBranchPresentOnRepo(notification))
+            notifications.add(notification);
+    }
 
-        notifications.add(notification);
+    private boolean isBranchPresentOnRepo(Notification notification) {
+        return createStreamOfNotifications(notification.build.scm.url)
+                    .filter(n -> n.build.scm.branch.contains(notification.build.scm.branch)).findAny().isPresent();
     }
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
@@ -60,6 +65,7 @@ public class RepositoryController {
                 .map(build -> new Response.Branch(build.build.scm.branch, build.build.status))
                 .collect(Collectors.toList());
     }
+
 
     private Stream<Notification> createStreamOfNotifications(String name) {
         return notifications.stream()
