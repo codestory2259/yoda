@@ -146,6 +146,32 @@ public class RepositoryControllerTest {
         controller.notification(createNotFinalized("tatooine"));
     }
 
+    @Test
+    public void onlyOneBranchExpected() throws Exception {
+        // Given
+        controller.notification(create("repository", "SUCCESS", "origin/branch"));
+        controller.notification(create("repository", "SUCCESS", "origin/branch"));
+
+        // When
+        Response response = controller.repository("repository");
+
+        // Then
+        assertThat(response.branches).hasSize(1);
+    }
+
+    @Test
+    public void statusGlobalEqualsToLastBranchStatus() throws Exception {
+        // Given
+        controller.notification(create("repository", "SUCCESS", "origin/branch"));
+        controller.notification(create("repository", "FAILED", "origin/branch"));
+
+        // When
+        Response response = controller.repository("repository");
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo("FAILED");
+    }
+
     private Notification createNotFinalized(String repository) {
         Notification notification = create(repository, "ANY-STATUS", "origin/master");
         notification.build.phase = "ANOTHER-STATUS";
