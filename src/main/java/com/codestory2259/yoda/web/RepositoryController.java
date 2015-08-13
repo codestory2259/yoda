@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,13 +28,20 @@ public class RepositoryController {
         if (!"FINALIZED".equals(notification.build.phase)) {
             throw new IllegalArgumentException("Build phase must be `FINALIZED`");
         }
-        if(!isBranchPresentOnRepo(notification))
+
+        Optional<Notification> existingNotification = getAnyBranchOnRepo(notification);
+
+        if (existingNotification.isPresent()) {
+            existingNotification.get().build.status = notification.build.status;
+        } else {
             notifications.add(notification);
+        }
+
     }
 
-    private boolean isBranchPresentOnRepo(Notification notification) {
+    private Optional<Notification> getAnyBranchOnRepo(Notification notification) {
         return createStreamOfNotifications(notification.build.scm.url)
-                    .filter(n -> n.build.scm.branch.contains(notification.build.scm.branch)).findAny().isPresent();
+                .filter(n -> n.build.scm.branch.contains(notification.build.scm.branch)).findAny();
     }
 
     @RequestMapping(method = GET, value = "/repository/{name}", produces = "application/json")
